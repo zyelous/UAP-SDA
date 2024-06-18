@@ -67,3 +67,94 @@ class JadwalManager:
             print("Impor dari CSV berhasil.")
         except Exception as e:
             print(f"Error: {e}")
+
+# GUI Tkinter
+def show_gui():
+    def tambah_jadwal():
+        kegiatan = entry_kegiatan.get()  # Mengambil nilai dari entry kegiatan
+        tanggal = entry_tanggal.get()  # Mengambil nilai dari entry tanggal
+        waktu = entry_waktu.get()  # Mengambil nilai dari entry waktu
+        deskripsi = entry_deskripsi.get()  # Mengambil nilai dari entry deskripsi
+        if kegiatan and tanggal and waktu and deskripsi:
+            manager.tambah_jadwal(kegiatan, tanggal, waktu, deskripsi)  # Memanggil fungsi tambah_jadwal dari JadwalManager
+            messagebox.showinfo("Sukses", "Jadwal berhasil ditambahkan!")  # Menampilkan messagebox sukses
+            lihat_jadwal()  # Refresh daftar jadwal setelah menambahkan
+        else:
+            messagebox.showwarning("Peringatan", "Semua kolom harus diisi!")  # Menampilkan messagebox peringatan jika ada kolom yang kosong
+
+    def lihat_jadwal():  #Implementasi Timsort untuk GUI
+        output_text.delete('1.0', tk.END)  # Menghapus teks pada output_text sebelum menampilkan jadwal baru
+        jadwals = sorted(manager.jadwals, key=lambda x: (x.tanggal, x.waktu))  # Mengurutkan jadwal berdasarkan tanggal dan waktu
+        for jadwal in jadwals:
+            output_text.insert(tk.END, f"{jadwal}\n")  # Memasukkan jadwal ke dalam output_text
+
+    def cari_jadwal():  #Implementasi Linear Search pada GUI
+        keyword = entry_cari.get()  # Mengambil nilai dari entry cari
+        hasil = manager.cari_jadwal(keyword)  # Memanggil fungsi cari_jadwal dari JadwalManager
+        output_text.delete('1.0', tk.END)  # Menghapus teks pada output_text sebelum menampilkan hasil pencarian
+        if hasil:
+            for jadwal in hasil:
+                output_text.insert(tk.END, f"{jadwal}\n")  # Memasukkan hasil pencarian ke dalam output_text
+        else:
+            output_text.insert(tk.END, "Jadwal tidak ditemukan.")  # Menampilkan pesan jika jadwal tidak ditemukan
+
+    def hapus_jadwal():
+        try:
+            id_jadwal = int(entry_hapus.get())  # Mengambil ID jadwal yang akan dihapus
+            manager.hapus_jadwal(id_jadwal)  # Memanggil fungsi hapus_jadwal dari JadwalManager
+            messagebox.showinfo("Sukses", f"Jadwal dengan ID {id_jadwal} berhasil dihapus!")  # Menampilkan messagebox sukses
+            lihat_jadwal()  # Refresh daftar jadwal setelah menghapus
+        except ValueError:
+            messagebox.showerror("Error", "ID Jadwal harus berupa angka.")  # Menampilkan messagebox error jika ID tidak valid
+
+    def update_jadwal_popup():
+        def update_jadwal():
+            try:
+                id_jadwal = int(entry_id_update.get())  # Mengambil ID jadwal yang akan diupdate
+                kegiatan = entry_kegiatan_update.get()  # Mengambil nilai dari entry kegiatan update
+                tanggal = entry_tanggal_update.get()  # Mengambil nilai dari entry tanggal update
+                waktu = entry_waktu_update.get()  # Mengambil nilai dari entry waktu update
+                deskripsi = entry_deskripsi_update.get()  # Mengambil nilai dari entry deskripsi update
+                manager.update_jadwal(id_jadwal, kegiatan, tanggal, waktu, deskripsi)  # Memanggil fungsi update_jadwal dari JadwalManager
+                messagebox.showinfo("Sukses", f"Jadwal dengan ID {id_jadwal} berhasil diupdate!")  # Menampilkan messagebox sukses
+                lihat_jadwal()  # Refresh daftar jadwal setelah mengupdate
+                update_window.destroy()  # Menutup jendela update setelah update selesai
+            except ValueError:
+                messagebox.showerror("Error", "ID Jadwal harus berupa angka.")  # Menampilkan messagebox error jika ID tidak valid
+
+        update_window = tk.Toplevel(root)  # Membuat jendela popup untuk update jadwal
+        update_window.title("Update Jadwal")  # Memberi judul pada jendela update
+        update_window.configure(bg="#273c75")  # Mengatur warna latar belakang jendela
+
+        tk.Label(update_window, text="Update Jadwal (ID):", bg="#273c75", fg="#ffffff").grid(row=0, column=0, padx=5, pady=5)  # Label untuk ID jadwal
+        entry_id_update = tk.Entry(update_window, bg="#ffffff", fg="#000000")  # Entry untuk mengisi ID jadwal
+        entry_id_update.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(update_window, text="Kegiatan:", bg="#273c75", fg="#ffffff").grid(row=1, column=0, padx=5, pady=5)  # Label untuk kegiatan
+        entry_kegiatan_update = tk.Entry(update_window, bg="#ffffff", fg="#000000")  # Entry untuk mengisi kegiatan baru
+        entry_kegiatan_update.grid(row=1, column=1, padx=5, pady=5)
+
+        tk.Label(update_window, text="Tanggal:", bg="#273c75", fg="#ffffff").grid(row=2, column=0, padx=5, pady=5)  # Label untuk tanggal
+        entry_tanggal_update = tk.Entry(update_window, bg="#ffffff", fg="#000000")  # Entry untuk mengisi tanggal baru
+        entry_tanggal_update.grid(row=2, column=1, padx=5, pady=5)
+
+        tk.Label(update_window, text="Waktu:", bg="#273c75", fg="#ffffff").grid(row=3, column=0, padx=5, pady=5)  # Label untuk waktu
+        entry_waktu_update = tk.Entry(update_window, bg="#ffffff", fg="#000000")  # Entry untuk mengisi waktu baru
+        entry_waktu_update.grid(row=3, column=1, padx=5, pady=5)
+
+        tk.Label(update_window, text="Deskripsi:", bg="#273c75", fg="#ffffff").grid(row=4, column=0, padx=5, pady=5)  # Label untuk deskripsi
+        entry_deskripsi_update = tk.Entry(update_window, bg="#ffffff", fg="#000000")  # Entry untuk mengisi deskripsi baru
+        entry_deskripsi_update.grid(row=4, column=1, padx=5, pady=5)
+
+        tk.Button(update_window,
+                  text="Update",
+                  command=update_jadwal,
+                  bg="#f39c12",
+                  fg="#ffffff").grid(row=5, column=1, padx=5, pady=5)  # Button untuk melakukan update
+
+    def import_csv():
+        filename = filedialog.askopenfilename(title="Pilih file CSV", filetypes=(("CSV files", ".csv"), ("All files", ".*")))  # Meminta pengguna untuk memilih file CSV
+        if filename:
+            manager.impor_jadwal_csv(filename)  # Memanggil fungsi impor_jadwal_csv dari JadwalManager
+            messagebox.showinfo("Sukses", "Impor dari CSV berhasil!")  # Menampilkan messagebox sukses
+            lihat_jadwal()  # Refresh daftar jadwal setelah mengimpor
