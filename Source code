@@ -1,0 +1,69 @@
+import csv
+from queue import Queue  # Import modul Queue dari library queue
+import tkinter as tk  # Import modul tkinter dengan alias tk
+from tkinter import messagebox, filedialog  # Import messagebox dan filedialog dari tkinter
+from tkinter import font as tkfont  # Import modul font dari tkinter dengan alias tkfont
+
+# Class Jadwal
+class Jadwal:
+    def init(self, id, kegiatan, tanggal, waktu, deskripsi):
+        self.id = id
+        self.kegiatan = kegiatan
+        self.tanggal = tanggal
+        self.waktu = waktu
+        self.deskripsi = deskripsi
+
+    def repr(self):
+        return f"{self.id}: {self.kegiatan} pada {self.tanggal} jam {self.waktu} - {self.deskripsi}"
+
+# Class dan List untuk mengelola jadwal
+class JadwalManager:
+    def init(self):
+        self.jadwals = []  # Inisialisasi list kosong untuk menyimpan jadwal-jadwal
+        self.counter = 1  # Counter untuk mengatur ID jadwal
+
+    def tambah_jadwal(self, kegiatan, tanggal, waktu, deskripsi):
+        new_jadwal = Jadwal(self.counter, kegiatan, tanggal, waktu, deskripsi)  # Membuat objek Jadwal baru
+        self.jadwals.append(new_jadwal)  # Menambahkan jadwal baru ke dalam list
+        self.counter += 1  # Menambah counter untuk ID berikutnya
+        print(f"Jadwal '{kegiatan}' berhasil ditambahkan.")
+
+    def lihat_jadwal(self):  #Implementasi Timsort
+        for jadwal in sorted(self.jadwals, key=lambda x: (x.tanggal, x.waktu)):
+            print(jadwal)  # Menampilkan semua jadwal yang sudah ada, diurutkan berdasarkan tanggal dan waktu
+
+    def update_jadwal(self, id, kegiatan=None, tanggal=None, waktu=None, deskripsi=None):
+        for jadwal in self.jadwals:
+            if jadwal.id == id:
+                if kegiatan: jadwal.kegiatan = kegiatan  # Update atribut kegiatan jika diberikan
+                if tanggal: jadwal.tanggal = tanggal  # Update atribut tanggal jika diberikan
+                if waktu: jadwal.waktu = waktu  # Update atribut waktu jika diberikan
+                if deskripsi: jadwal.deskripsi = deskripsi  # Update atribut deskripsi jika diberikan
+                print(f"Jadwal dengan ID {id} berhasil diupdate.")
+                return
+        print(f"Jadwal dengan ID {id} tidak ditemukan.")
+
+    def hapus_jadwal(self, id):
+        initial_length = len(self.jadwals)  # Panjang awal list jadwal
+        self.jadwals = [jadwal for jadwal in self.jadwals if jadwal.id != id]  # Menghapus jadwal berdasarkan ID
+        if len(self.jadwals) < initial_length:
+            print(f"Jadwal dengan ID {id} berhasil dihapus.")
+        else:
+            print(f"Jadwal dengan ID {id} tidak ditemukan.")
+
+    def cari_jadwal(self, keyword):  #Implementasi Linear Search
+        hasil = [
+            jadwal for jadwal in self.jadwals
+            if keyword.lower() in jadwal.kegiatan.lower()
+        ]  # Mencari jadwal berdasarkan keyword pada kegiatan
+        return hasil
+
+    def impor_jadwal_csv(self, filename):
+        try:
+            with open(filename, mode='r') as file:
+                csv_reader = csv.DictReader(file)  # Membaca file CSV sebagai dictionary
+                for row in csv_reader:
+                    self.tambah_jadwal(row['kegiatan'], row['tanggal'], row['waktu'], row['deskripsi'])  # Menambah jadwal dari data CSV
+            print("Impor dari CSV berhasil.")
+        except Exception as e:
+            print(f"Error: {e}")
